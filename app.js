@@ -13,12 +13,11 @@ const nonexistentUrl = (req, res) => {
 };
 nonexistentUrlRouter.get('*', nonexistentUrl);
 
+app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', usersRouter);
 app.use('/', cardsRouter);
-app.use('/', nonexistentUrlRouter);
+app.use('*', nonexistentUrlRouter);
 
 app.listen(PORT, () => {
   console.log('Ссылка на сервер: http://localhost:3000/');
 });
-
-app.use(express.static(path.join(__dirname, 'public')));
