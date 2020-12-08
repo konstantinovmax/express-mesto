@@ -9,7 +9,7 @@ const usersRouter = require('./routes/users');
 const cardsRouter = require('./routes/cards');
 
 const nonexistentUrl = (req, res) => {
-  res.send({ 'message': 'Запрашиваемый ресурс не найден' });
+  res.send({ message: 'Запрашиваемый ресурс не найден' });
 };
 nonexistentUrlRouter.get('*', nonexistentUrl);
 

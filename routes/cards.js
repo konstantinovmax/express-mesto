@@ -9,5 +9,4 @@ const cardsList = (req, res) => {
 
 cardsRouter.get('/cards', cardsList);
 
-
 module.exports = cardsRouter;
