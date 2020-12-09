@@ -5,7 +5,13 @@ const fsPromises = require('fs').promises;
 const usersData = path.join(__dirname, '../data/users.json');
 
 const usersList = (req, res) => {
-  res.send(require(usersData));
+  fsPromises.readFile(usersData, { encoding: 'utf8' })
+    .then(() => {
+      res.json(require(usersData));
+    })
+    .catch(() => {
+      res.status(404).send({ error: 'Запрашиваемый ресурс не найден' });
+    });
 };
 
 const doesUserExist = (req, res) => {
