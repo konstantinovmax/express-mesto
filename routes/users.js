@@ -10,7 +10,7 @@ const usersList = (req, res) => {
       res.json(require(usersData));
     })
     .catch(() => {
-      res.status(404).send({ error: 'Запрашиваемый ресурс не найден' });
+      res.status(404).send({ error: 'Запрашиваемый файл не найден' });
     });
 };
 
