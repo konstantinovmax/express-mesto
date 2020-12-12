@@ -8,33 +8,64 @@ const usersList = (req, res) => {
 
 const doesUserExist = (req, res) => {
   User.findById(req.params.id)
+    .orFail(() => {
+      const customError = new Error('CustomError');
+      return customError;
+    })
     .then((user) => res.status(200).send(user))
-    .catch(() => res.status(404).send({ message: 'Не удалось найти пользователя' }));
+    .catch((err) => {
+      if (err.message === 'CustomError') {
+        res.status(404).send({ message: 'Не удалось найти пользователя' });
+      }
+      res.status(500).send({ message: 'Ошибка сервера' });
+    });
 };
 
 const createUser = (req, res) => {
   const { name, about, avatar } = req.body;
 
-  User.create({ name, about, avatar })
+  User.create({ name, about, avatar }, { runValidators: true })
     .then((user) => res.status(200).send(user))
-    .catch(() => res.status(400).send({ message: 'Переданы некорректные данные при создании пользователя' }));
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        res.status(400).send({ message: err.message });
+      }
+      res.status(500).send({ message: 'Ошибка сервера' });
+    });
 };
 
 const updateUser = (req, res) => {
   const { name, about } = req.body;
 
-  User.findByIdAndUpdate(req.params.id, { name, about })
+  User.findByIdAndUpdate(req.user._id, { name, about }, { runValidators: true })
+    .orFail(() => {
+      const customError = new Error('CustomError');
+      return customError;
+    })
     .then(() => res.status(200).send({ name, about }))
-    .catch(() => res.status(404).send({ message: 'Не удалось обновить данные пользователя' }));
+    .catch((err) => {
+      if (err.message === 'CustomError') {
+        res.status(400).send({ message: err.message });
+      }
+      res.status(500).send({ message: 'Ошибка сервера' });
+    });
 };
 
 const updateUserAvatar = (req, res) => {
   const { avatar } = req.body;
 
-  User.findByIdAndUpdate(req.params.id, { avatar })
+  User.findByIdAndUpdate(req.user._id, { avatar }, { runValidators: true })
+    .orFail(() => {
+      const customError = new Error('CustomError');
+      return customError;
+    })
     .then(() => res.status(200).send({ avatar }))
-    .catch(() => res.status(404).send({ message: 'Не удалось обновить аватар пользователя' }));
+    .catch((err) => {
+      if (err.message === 'CustomError') {
+        res.status(400).send({ message: err.message });
+      }
+      res.status(500).send({ message: 'Ошибка сервера' });
+    });
 };
-
 
 module.exports = { usersList, doesUserExist, createUser, updateUser, updateUserAvatar };

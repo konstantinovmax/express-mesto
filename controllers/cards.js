@@ -12,26 +12,57 @@ const createCard = (req, res) => {
 
   Card.create({ name, link, owner: req.user._id })
     .then((card) => res.status(200).send(card))
-    .catch(() => res.status(400).send({ message: 'Переданы некорректные данные при создании карточки' }));
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        res.status(400).send({ message: 'Ошибка при создании карточки' });
+      }
+      res.status(500).send({ message: 'Ошибка сервера' });
+    });
 };
 
 const deleteCard = (req, res) => {
-  Card.deleteOne(req.params.id)
+  Card.deleteOne(req.params.cardId)
+    .orFail(() => {
+      const customError = new Error('CustomError');
+      return customError;
+    })
     .then((card) => res.status(200).send(card))
-    .catch(() => res.status(404).send({ message: 'Не удалось удалить карточку' }));
+    .catch((err) => {
+      if (err.message === 'CustomError') {
+        res.status(404).send({ message: 'Не удалось удалить карточку' });
+      }
+      res.status(500).send({ message: 'Ошибка сервера' });
+    });
 };
 
 const cardLike = (req, res) => {
   Card.findByIdAndUpdate(req.params.cardId, { $addToSet: { likes: req.user._id } }, { new: true })
+    .orFail(() => {
+      const customError = new Error('CustomError');
+      return customError;
+    })
     .then((card) => res.status(200).send(card))
-    .catch(() => res.status(404).send({ message: 'Не удалось поставить лайк карточке' }));
-}
+    .catch((err) => {
+      if (err.message === 'CustomError') {
+        res.status(404).send({ message: 'Не удалось поставить лайк карточке' });
+      }
+      res.status(500).send({ message: 'Ошибка сервера' });
+    });
+};
 
 const cardLikeRemove = (req, res) => {
   Card.findByIdAndUpdate(req.params.cardId, { $pull: { likes: req.user._id } }, { new: true })
+    .orFail(() => {
+      const customError = new Error('CustomError');
+      return customError;
+    })
     .then((card) => res.status(200).send(card))
-    .catch(() => res.status(404).send({ message: 'Не удалось убрать лайк у карточки' }));
-}
-
+    .catch((err) => {
+      if (err.message === 'CustomError') {
+        res.status(404).send({ message: 'Не удалось убрать лайк у карточки' });
+      }
+      res.status(500).send({ message: 'Ошибка сервера' });
+    });
+};
 
 module.exports = { cardsList, createCard, deleteCard, cardLike, cardLikeRemove };
