@@ -2,6 +2,7 @@ const Card = require('../models/card');
 
 const cardsList = (req, res) => {
   Card.find({})
+    .populate(['owner', 'likes'])
     .then((cards) => res.status(200).send(cards))
     .catch(() => res.status(500).send({ message: 'Не удалось загрузить список карточек' }));
 };
@@ -9,13 +10,13 @@ const cardsList = (req, res) => {
 const createCard = (req, res) => {
   const { name, link } = req.body;
 
-  Card.create({ name, link })
+  Card.create({ name, link, owner: req.user._id })
     .then((card) => res.status(200).send(card))
     .catch(() => res.status(400).send({ message: 'Переданы некорректные данные при создании карточки' }));
 };
 
 const deleteCard = (req, res) => {
-  Card.findByIdAndRemove(req.params.id)
+  Card.deleteOne(req.params.id)
     .then((card) => res.status(200).send(card))
     .catch(() => res.status(404).send({ message: 'Не удалось удалить карточку' }));
 };

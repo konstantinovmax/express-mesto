@@ -23,7 +23,7 @@ const createUser = (req, res) => {
 const updateUser = (req, res) => {
   const { name, about } = req.body;
 
-  User.findByIdAndUpdate({ name, about }, req.params.id)
+  User.findByIdAndUpdate(req.params.id, { name, about })
     .then(() => res.status(200).send({ name, about }))
     .catch(() => res.status(404).send({ message: 'Не удалось обновить данные пользователя' }));
 };
@@ -31,7 +31,7 @@ const updateUser = (req, res) => {
 const updateUserAvatar = (req, res) => {
   const { avatar } = req.body;
 
-  User.findByIdAndUpdate({ avatar }, req.params.id)
+  User.findByIdAndUpdate(req.params.id, { avatar })
     .then(() => res.status(200).send({ avatar }))
     .catch(() => res.status(404).send({ message: 'Не удалось обновить аватар пользователя' }));
 };
