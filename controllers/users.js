@@ -39,7 +39,12 @@ const updateUser = (req, res) => {
   const { name, about } = req.body;
 
   User.findByIdAndUpdate(req.user._id, { name, about }, { runValidators: true, new: true })
-    .then((user) => res.status(200).send(user))
+    .then((user) => {
+      if (!user) {
+        return res.status(404).send({ message: 'Не удалось найти пользователя' });
+      }
+      return res.status(200).send(user);
+    })
     .catch((err) => {
       if (err.name === 'ValidationError') {
         return res.status(400).send({ message: err.message });
@@ -52,7 +57,12 @@ const updateUserAvatar = (req, res) => {
   const { avatar } = req.body;
 
   User.findByIdAndUpdate(req.user._id, { avatar }, { runValidators: true, new: true })
-    .then((user) => res.status(200).send(user))
+    .then((user) => {
+      if (!user) {
+        return res.status(404).send({ message: 'Не удалось найти пользователя' });
+      }
+      return res.status(200).send(user);
+    })
     .catch((err) => {
       if (err.name === 'ValidationError') {
         return res.status(400).send({ message: err.message });
