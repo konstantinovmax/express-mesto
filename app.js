@@ -1,8 +1,9 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const path = require('path');
-const nonexistentUrlRouter = require('express').Router();
 const bodyParser = require('body-parser');
+const usersRouter = require('./routes/users');
+const cardsRouter = require('./routes/cards');
 
 const { PORT = 3000 } = process.env;
 const app = express();
@@ -13,14 +14,6 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
   useFindAndModify: false,
   useUnifiedTopology: true,
 });
-
-const usersRouter = require('./routes/users');
-const cardsRouter = require('./routes/cards');
-
-const nonexistentUrl = (req, res) => {
-  res.status(404).send({ message: 'Запрашиваемый ресурс не найден' });
-};
-nonexistentUrlRouter.get('*', nonexistentUrl);
 
 app.use(bodyParser.json());
 app.use((req, res, next) => {
@@ -33,7 +26,11 @@ app.use((req, res, next) => {
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', usersRouter);
 app.use('/', cardsRouter);
-app.use('*', nonexistentUrlRouter);
+app.use('*', (req, res, next) => {
+  res.status(404).send({ message: 'Запрашиваемый ресурс не найден' });
+
+  next();
+});
 
 app.listen(PORT, () => {
   console.log('Ссылка на сервер: http://localhost:3000/');

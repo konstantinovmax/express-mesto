@@ -8,10 +8,15 @@ const usersList = (req, res) => {
 
 const doesUserExist = (req, res) => {
   User.findById(req.params.id)
-    .then((user) => res.status(200).send(user))
+    .then((user) => {
+      if (!user) {
+        return res.status(404).send({ message: 'Не удалось найти пользователя' });
+      }
+      return res.status(200).send(user);
+    })
     .catch((err) => {
       if (err.kind === 'ObjectId') {
-        return res.status(404).send({ message: 'Не удалось найти пользователя' });
+        return res.status(400).send({ message: 'Некорректно указан id пользователя' });
       }
       return res.status(500).send({ message: 'Ошибка сервера' });
     });
@@ -33,7 +38,7 @@ const createUser = (req, res) => {
 const updateUser = (req, res) => {
   const { name, about } = req.body;
 
-  User.findByIdAndUpdate(req.user._id, { name, about }, { runValidators: true })
+  User.findByIdAndUpdate(req.user._id, { name, about }, { runValidators: true, new: true })
     .then((user) => res.status(200).send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -46,7 +51,7 @@ const updateUser = (req, res) => {
 const updateUserAvatar = (req, res) => {
   const { avatar } = req.body;
 
-  User.findByIdAndUpdate(req.user._id, { avatar }, { runValidators: true })
+  User.findByIdAndUpdate(req.user._id, { avatar }, { runValidators: true, new: true })
     .then((user) => res.status(200).send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
